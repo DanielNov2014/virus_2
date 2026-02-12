@@ -1,5 +1,5 @@
 #DISABLE DEFENDER SCRIPT BY ZOIC
-
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope LocalMachine
 
 If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) 
 {	Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
@@ -139,3 +139,4 @@ Remove-Item -Path "$env:TEMP\DisableDefend.bat" -Force | Out-Null
 
 
 [reflection.assembly]::loadwithpartialname("System.Windows.Forms") | Out-Null 
+
